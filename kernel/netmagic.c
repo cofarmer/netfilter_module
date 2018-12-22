@@ -44,9 +44,9 @@ unsigned int handle_udp(struct sk_buff *sk_buf)
 {
 	//
 	// TODO: 
-	//		UDPÊı¾İ°ü¼ÓÍ·£¨Í¬TCP·½Ê½£©
-	//		½«×îºóÒ»ÌøµÄUDP·şÎñÆ÷³ÌĞò·ÅÔÚ±¾µØÔËĞĞ£¨ĞŞ¸ÄÆäÖĞµÄ¼Ó½âÃÜË³Ğò£©
-	//		iptables ĞÂ½¨¹æÔò½«UDPµÄ°ü×ªÏò±¾µØÒ»¸ö¶Ë¿Ú£¨UDP·şÎñÆ÷³ÌĞò¼àÌıµÄ¶Ë¿Ú£©
+	//		UDPæ•°æ®åŒ…åŠ å¤´ï¼ˆåŒTCPæ–¹å¼ï¼‰
+	//		å°†æœ€åä¸€è·³çš„UDPæœåŠ¡å™¨ç¨‹åºæ”¾åœ¨æœ¬åœ°è¿è¡Œï¼ˆä¿®æ”¹å…¶ä¸­çš„åŠ è§£å¯†é¡ºåºï¼‰
+	//		iptables æ–°å»ºè§„åˆ™å°†UDPçš„åŒ…è½¬å‘æœ¬åœ°ä¸€ä¸ªç«¯å£ï¼ˆUDPæœåŠ¡å™¨ç¨‹åºç›‘å¬çš„ç«¯å£ï¼‰
 	//
 
 	struct iphdr *ip_header = NULL;
@@ -87,7 +87,7 @@ unsigned int handle_udp(struct sk_buff *sk_buf)
 		return NF_ACCEPT;
 	}
 
-	_payload = (char *)kmalloc(payload_len + sizeof(struct _msg_header) + 1, GFP_KERNEL);
+	_payload = (char *)kmalloc(payload_len + sizeof(struct _msg_header) + 1, GFP_ATOMIC);
 	if (_payload)
 	{
 		msgheader = (struct _msg_header *)_payload;
@@ -107,7 +107,7 @@ unsigned int handle_udp(struct sk_buff *sk_buf)
 			msgheader->flowtuple.dport = ct->tuplehash[CTINFO2DIR(ctinfo)].tuple.dst.u.all;
 
 			// 
-			// TODO: DNS½Ù³Ö
+			// TODO: DNSåŠ«æŒ
 			//
 
 			//printk(KERN_INFO"handle_udp: %pI4:%u ==> %pI4:%u \n", 
@@ -117,7 +117,7 @@ unsigned int handle_udp(struct sk_buff *sk_buf)
 			//	ntohs(msgheader->flowtuple.dport));
 
 
-			// ¼ÓÈëÁ¬½Ó¸ú×ÙĞÅÏ¢£¬ÄÚºË°æ±¾4.**µÄ»á×Ô¶¯ĞŞÕıseqºÍack
+			// åŠ å…¥è¿æ¥è·Ÿè¸ªä¿¡æ¯ï¼Œå†…æ ¸ç‰ˆæœ¬4.**çš„ä¼šè‡ªåŠ¨ä¿®æ­£seqå’Œack
 			//nfct_seqadj_ext_add(ct);
 
 			// modify packet(expand packet size and insert msgheader into head)
@@ -161,7 +161,7 @@ static unsigned int hook_proc(
 {
 	struct iphdr *ip_header = NULL;
 
-	// IPÊı¾İ°üfragºÏ²¢
+	// IPæ•°æ®åŒ…fragåˆå¹¶
 	if (skb_is_nonlinear(sk_buf))
 	{
 		if ( 0 != skb_linearize(sk_buf))
